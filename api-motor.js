@@ -55,7 +55,7 @@ let motorData = generateMotorData();
 setInterval(() => {
   motorData = generateMotorData();
   console.log('Datos actualizados:', new Date().toISOString());
-}, 60 * 1000);
+}, 24 * 60 * 60 * 1000);
 
 // Rutas
 app.get('/api/motor', (req, res) => {
