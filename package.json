@@ -1,0 +1,17 @@
+{
+  "name": "api-simulador-motor",
+  "version": "1.0.0",
+  "description": "API que simula datos de un motor con actualizaciones periódicas",
+  "main": "api-motor.js",
+  "scripts": {
+    "start": "node api-motor.js",
+    "dev": "nodemon api-motor.js"
+  },
+  "dependencies": {
+    "api-simulador-motor": "file:",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
