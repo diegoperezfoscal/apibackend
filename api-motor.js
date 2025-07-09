@@ -9,41 +9,48 @@ app.use((req, res, next) => {
   next();
 });
 
-// Función para generar datos simulados
+// Funciones auxiliares
+function randBetween(min, max) {
+  return parseFloat((Math.random() * (max - min) + min).toFixed(2));
+}
+
 function generateMotorData() {
-  const timestamp = new Date().toISOString();
-  
+  const rpm = randBetween(1050, 1400);
+  const carga = randBetween(30, 90);
+  const velocidad = Math.round((rpm - 1000) * 0.1 + randBetween(5, 15)); // proporcional al RPM
+  const relacionTransmision = carga > 70 ? "4ta" : (carga > 50 ? "3ra" : "2da");
+
   return {
-    timestamp,
+    timestamp: new Date().toISOString(),
     motor: {
-      rpm: Math.floor(Math.random() * 5000 + 800), // 800–5800 RPM
-      temperaturaAgua: parseFloat((Math.random() * 40 + 70).toFixed(2)), // 70–110°C
-      temperaturaAceite: parseFloat((Math.random() * 40 + 80).toFixed(2)), // 80–120°C
-      presionAceite: parseFloat((Math.random() * 4 + 1).toFixed(2)), // 1–5 bar
-      voltajeBateria: parseFloat((Math.random() * 2 + 12).toFixed(2)), // 12–14V
-      consumoCombustibleLh: parseFloat((Math.random() * 10 + 5).toFixed(2)), // 5–15 L/h
-      cargaMotor: parseFloat((Math.random() * 100).toFixed(2)), // 0–100%
-      tiempoEncendidoMin: parseFloat((Math.random() * 60).toFixed(2)), // 0–60 minutos
-      velocidadVehiculo: parseFloat((Math.random() * 150).toFixed(2)), // 0–150 km/h
-      relacionTransmision: ["1ra", "2da", "3ra", "4ta", "5ta", "6ta", "N", "R"][Math.floor(Math.random() * 8)],
-      modoOperacion: ["Ralentí", "Crucero", "Aceleración", "Freno motor", "Carga"][Math.floor(Math.random() * 5)]
+      rpm,
+      temperaturaAgua: randBetween(88, 96),              // 88–96 °C
+      temperaturaAceite: randBetween(95, 110),           // 95–110 °C
+      presionAceite: randBetween(2.2, 3.5),              // 2.2–3.5 bar
+      voltajeBateria: randBetween(12.5, 13),             // 12.5–13 V
+      consumoCombustibleLh: parseFloat((carga / 100 * randBetween(18, 25)).toFixed(2)), // proporcional a la carga
+      cargaMotor: carga,
+      tiempoEncendidoMin: randBetween(1, 120),           // 1–120 min
+      velocidadVehiculo: velocidad,
+      relacionTransmision,
+      modoOperacion: carga > 70 ? "Carga" : (carga < 40 ? "Ralentí" : "Crucero")
     },
     bancos: {
       A1: {
-        lambda: parseFloat((Math.random() * 0.2 + 0.9).toFixed(2)), // 0.9–1.1
-        tiempoInyeccionMs: parseFloat((Math.random() * 3 + 1).toFixed(2)), // 1–4 ms
-        tiempoEncendidoAvance: parseFloat((Math.random() * 20).toFixed(2)), // 0–20°
-        temperaturaEGT: parseFloat((Math.random() * 400 + 400).toFixed(2)), // 400–800°C
-        presionCombustible: parseFloat((Math.random() * 2 + 2).toFixed(2)), // 2–4 bar
-        presionTurbo: parseFloat((Math.random() * 1 + 0.5).toFixed(2)) // 0.5–1.5 bar
+        lambda: randBetween(0.98, 1.03),                  // Mezcla aire-comb.
+        tiempoInyeccionMs: randBetween(2, 3),             // 2–3 ms
+        tiempoEncendidoAvance: randBetween(8, 12),        // 8–12°
+        temperaturaEGT: randBetween(480, 620),            // 480–620 °C
+        presionCombustible: randBetween(3.5, 4.5),        // 3.5–4.5 bar
+        presionTurbo: randBetween(1.0, 1.4)               // 1.0–1.4 bar
       },
       B1: {
-        lambda: parseFloat((Math.random() * 0.2 + 0.9).toFixed(2)),
-        tiempoInyeccionMs: parseFloat((Math.random() * 3 + 1).toFixed(2)),
-        tiempoEncendidoAvance: parseFloat((Math.random() * 20).toFixed(2)),
-        temperaturaEGT: parseFloat((Math.random() * 400 + 400).toFixed(2)),
-        presionCombustible: parseFloat((Math.random() * 2 + 2).toFixed(2)),
-        presionTurbo: parseFloat((Math.random() * 1 + 0.5).toFixed(2))
+        lambda: randBetween(0.98, 1.03),
+        tiempoInyeccionMs: randBetween(2, 3),
+        tiempoEncendidoAvance: randBetween(8, 12),
+        temperaturaEGT: randBetween(480, 620),
+        presionCombustible: randBetween(3.5, 4.5),
+        presionTurbo: randBetween(1.0, 1.4)
       }
     }
   };
@@ -55,7 +62,7 @@ let motorData = generateMotorData();
 setInterval(() => {
   motorData = generateMotorData();
   console.log('Datos actualizados:', new Date().toISOString());
-}, 60 * 1000)
+}, 60 * 1000);
 
 // Rutas
 app.get('/api/motor', (req, res) => {
